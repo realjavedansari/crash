@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rocket Game</title>
+  <style>
+    #gameState, #rocketPosition, #crashedPosition, #waitingTime {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Rocket Game</h1>
+  <div id="gameState"></div>
+  <div id="rocketPosition"></div>
+  <div id="crashedPosition"></div>
+  <div id="waitingTime"></div>
+
+  <canvas id="myCanvas" height="400" width="700" style="border: 1px dashed black;"></canvas>
+
+  <script>
+    var globalRocketPosition = 0.0;
+
+    // Connect to the WebSocket server
+    const ws = new WebSocket('ws://localhost:8080');
+
+    // WebSocket connection opened
+    ws.onopen = function open() {
+      console.log('Connected to server');
+    };
+
+    // WebSocket message received
+    ws.onmessage = function incoming(event) {
+      
+      drawImageAtX('player.png', globalRocketPosition, 428/4, 435/4);
+      drawCurveTillX(globalRocketPosition);
+      
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      
+      const gameUpdate = JSON.parse(event.data);
+
+      // console.log(gameUpdate);
+
+      // Display game state and data
+      document.getElementById('gameState').textContent = 'Game State: ' + gameUpdate.gameState;
+      document.getElementById('rocketPosition').textContent = 'Rocket Position: ' + JSON.stringify(gameUpdate.rocketPosition);
+      globalRocketPosition = JSON.stringify(gameUpdate.rocketPosition);
+      // console.log(globalRocketPosition);
+
+      // loop to draw canvas
+
+      document.getElementById('crashedPosition').textContent = 'Crashed Position: ' + JSON.stringify(gameUpdate.crashedPosition);
+      document.getElementById('waitingTime').textContent = 'Waiting Time: ' + gameUpdate.remainingTime;
+
+      // calls the set_animation of game
+    };
+
+    // WebSocket connection closed
+    ws.onclose = function close() {
+      console.log('Disconnected from server');
+    };
+
+  </script>
+  <script>
+    // Get the canvas and context
+    var canvas = document.getElementById('myCanvas');
+    var ctx = canvas.getContext('2d');
+    
+    // Set the scale and shift for the graph
+    var scale = 320;
+    var shiftX = 0;
+    var shiftY = canvas.height;
+    
+    function drawCurveTillX(limit) {
+        // Loop over x values from 0 to 2 in steps of 0.01
+        for (var x = 0; x <= limit; x += 0.01) {
+            // Calculate the corresponding y value
+            var y = Math.pow(0.55 * x, Math.E);
+            
+            // Convert x and y to canvas coordinates
+            var canvasX = shiftX + x * scale;
+            var canvasY = shiftY - y * scale;
+            
+            // Draw a point at the calculated position
+            ctx.fillRect(canvasX, canvasY, 1, 1);
+        }
+    }
+    
+    // Function to calculate y value for a given x
+    function calculateY(x) {
+        return Math.pow(0.55 * x, Math.E);
+    }
+    
+    // Function to draw an image at a given x value on the curve
+    function drawImageAtX(imageSrc, x, width, height) {
+        var img = new Image();
+        img.src = imageSrc;
+        img.onload = function() {
+            var y = calculateY(x);
+            var canvasX = x * scale + shiftX - (width/2);
+            var canvasY = shiftY - y * scale - (height/2);
+            ctx.drawImage(img, canvasX, canvasY, width, height);
+        };
+
+        // drawCurveTillX(x);
+    }
+    
+    // Example usage: Draw an image at x = 1
+    
+</script>
+</body>
+</html>

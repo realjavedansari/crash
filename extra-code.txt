@@ -1,0 +1,32 @@
+// game state = 'playing' || 'crashed' || 'waiting'
+
+    /*
+    we need to use a queue to save all the data incoming from the server
+    
+    if prev_state == 'playing' then transition
+    WILL LAG BEHIND BY 250ms
+
+    transition() {
+      y pixel position is needed along an exponential curve
+      move object from y_prev to y_new
+    }
+
+    set_animation() {
+      if (game_state == 'playing') {
+        game transition?
+      } else if (game_state == 'waiting') {
+        overlay progress bar
+      } else if (game_state == 'crashed') {
+        overlay CRASHED
+      }
+    }
+
+
+    BREAKING DOWN INTO TASKS
+    1. Create Exponential Curve Equation
+    e = 2.71828182846;
+    y = 1 - x^e;
+    2. make rocket move along curve depending on 
+    
+
+    */

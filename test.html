@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+        <title>Document</title>
+    </head>
+    <body>
+        <canvas id="myCanvas" height="400" width="700" style="border: 1px dashed black;"></canvas>
+        <script>
+            // Get the canvas and context
+            var canvas = document.getElementById('myCanvas');
+            var ctx = canvas.getContext('2d');
+            
+            // Set the scale and shift for the graph
+            var scale = 320;
+            var shiftX = 0;
+            var shiftY = canvas.height;
+            
+            function drawCurveTillX(limit) {
+                // Loop over x values from 0 to 2 in steps of 0.01
+                for (var x = 0; x <= limit; x += 0.01) {
+                    // Calculate the corresponding y value
+                    var y = Math.pow(0.55 * x, Math.E);
+                    
+                    // Convert x and y to canvas coordinates
+                    var canvasX = shiftX + x * scale;
+                    var canvasY = shiftY - y * scale;
+                    
+                    // Draw a point at the calculated position
+                    ctx.fillRect(canvasX, canvasY, 1, 1);
+                }
+            }
+            
+            // Function to calculate y value for a given x
+            function calculateY(x) {
+                return Math.pow(0.55 * x, Math.E);
+            }
+            
+            // Function to draw an image at a given x value on the curve
+            function drawImageAtX(imageSrc, x, width, height) {
+                var img = new Image();
+                img.onload = function() {
+                    var y = calculateY(x);
+                    var canvasX = x * scale + shiftX - (width/2);
+                    var canvasY = shiftY - y * scale - (height/2);
+                    ctx.drawImage(img, canvasX, canvasY, width, height);
+                };
+                img.src = imageSrc;
+
+                drawCurveTillX(x);
+            }
+            
+            // Example usage: Draw an image at x = 1
+            drawImageAtX('player.png', 1.7, 428/4, 435/4);
+            
+        </script>
+    </body>
+    </html>
